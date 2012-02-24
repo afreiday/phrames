@@ -1,5 +1,7 @@
 <?php
 
+  namespace phrames\model;
+
   /**
    * Basic definition for a database Model field
    */

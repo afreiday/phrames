@@ -1,10 +1,8 @@
 <?php
 
-  require_once("Expression.class.php");
-  require_once("ExpressionNode.class.php");
-  require_once("QueryResult.class.php");
+  namespace phrames\query;
 
-  class QuerySet implements IteratorAggregate, ArrayAccess, Countable {
+  class QuerySet implements \IteratorAggregate, \ArrayAccess, \Countable {
 
     /**
      * Arguments of the query
@@ -45,8 +43,8 @@
      * @param array $args
      */
 		public function __construct($parent, $args = null) {
-			if (!($parent instanceof QuerySet) && !is_subclass_of($parent, "Model")) 
-				throw new Exception("Invalid QuerySet parent. Must either be valid class name " .
+			if (!($parent instanceof QuerySet) && !is_subclass_of($parent, "\phrames\model\Model")) 
+				throw new \Exception("Invalid QuerySet parent. Must either be valid class name " .
 						"or QuerySet object.");
 
 			$this->parent = $parent;
@@ -56,12 +54,12 @@
         foreach($args as $arg) {
           // just an integer, assume searching by id
           if (is_int($arg))
-            $arg = Field::id__exact($arg);
+            $arg = \phrames\model\Field::id__exact($arg);
 
           if ($arg instanceof Expression || $arg instanceof ExpressionNode)
             $this->args[] = $arg;
           else
-            throw new Exception("Invalid QuerySet argument " . var_export($arg, true));
+            throw new \Exception("Invalid QuerySet argument " . var_export($arg, true));
         }
       }
 
@@ -120,7 +118,7 @@
 		public function filter() {
       if ($this->limit || $this->order_by)
         throw new Exception("Cannot further filter query after limiting or ordering.");
-      return new QueryFilter($this, func_get_args()); 
+      return new \phrames\query\QueryFilter($this, func_get_args()); 
 		}
 
     /**

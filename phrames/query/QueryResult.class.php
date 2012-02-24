@@ -1,8 +1,12 @@
 <?php
 
+  namespace phrames\query;
+
+  use phrames\db\Database as Database;
+
   require_once("QuerySet.class.php");
 
-  class QueryResult implements Countable, Iterator, ArrayAccess {
+  class QueryResult implements \Countable, \Iterator, \ArrayAccess {
 
     /**
      * Store the QuerySet that this result references

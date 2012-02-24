@@ -1,19 +1,20 @@
 <?php
 
+  namespace phrames\db;
+
   class Database {
 
     private static $driver;
 
     public function __construct() {
-      if (!self::$driver instanceof DB) {
+      if (!(self::$driver instanceof \phrames\db\drivers\DB_Driver)) {
         $driver = self::get_driver();
         self::$driver = new $driver;
       }
     }
 
     public static function get_driver() {
-      $driver = "DB_" . strtoupper(Config_phrames::DB_DRIVER);
-      require_once("drivers/{$driver}.class.php");
+      $driver = "\\phrames\\db\\drivers\\DB_" . strtoupper(\phrames\Config_phrames::DB_DRIVER);
       return $driver;
     }
 

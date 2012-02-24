@@ -1,6 +1,6 @@
 <?php
 
-  require_once("Negatable.class.php");
+  namespace phrames\query;
 
   abstract class ExpressionNode extends Negatable {
 

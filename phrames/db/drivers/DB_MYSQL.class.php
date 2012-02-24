@@ -1,9 +1,14 @@
 <?php
 
-  require_once("DB_Driver.class.php");
-  require_once(dirname(__FILE__) . "/../../query/QueryBuilder.class.php");
+  namespace phrames\db\drivers;
 
-  class DB_MYSQL implements DB_Driver {
+  use phrames\Config_phrames as Config_phrames;
+  use phrames\query\QueryBuilder as QueryBuilder;
+  use phrames\query\QuerySet as QuerySet;
+  use phrames\query\Field as Field;
+  use phrames\model\ForeignKey as ForeignKey;
+
+  class DB_MYSQL implements \phrames\db\drivers\DB_Driver {
 
     /**
      * Stores the PDO connection for this database driver
@@ -84,7 +89,7 @@
           if (is_array($v) && sizeof($v) == 2) 
             return "{$f} BETWEEN {$builder->hash($v[0])} AND {$builder->hash($v[1])}";
           else 
-            throw new Exception("Invalid RANGE expression for {$f}: " .
+            throw new \Exception("Invalid RANGE expression for {$f}: " .
                 "must be an array with two items.");
         },
         "YEAR" => function($builder, $f, $v) {
@@ -160,8 +165,8 @@
      * database connection
      */
     public function __construct() {
-      if (!self::$conn instanceof PDO)
-        self::$conn = new PDO(
+      if (!self::$conn instanceof \PDO)
+        self::$conn = new \PDO(
             "mysql:host=" . Config_phrames::DB_HOST .
               ";dbname=" . Config_phrames::DB_NAME,
             Config_phrames::DB_USER,
@@ -179,7 +184,7 @@
      */
     public function get_row($table, $id_field, $id) {
       return self::$conn->query("SELECT * FROM {$table} WHERE {$id_field}={$id}")
-        ->fetch(PDO::FETCH_ASSOC);
+        ->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -276,8 +281,8 @@
      * @return string
      */
     public function expression_parse(QueryBuilder $builder, QuerySet $query,
-        Expression $exp) {
-      if ($exp instanceof ExpressionMath) {
+        \phrames\query\Expression $exp) {
+      if ($exp instanceof \phrames\query\ExpressionMath) {
         $operators = self::math_operators();
       } else {
         $operators = self::operators();
@@ -290,7 +295,7 @@
       $field = $this->field_parse($builder, $query, $exp->get_field());
 
       // return sql expression portion string
-      if ($exp->get_value() instanceof ExpressionMath) {
+      if ($exp->get_value() instanceof \phrames\query\ExpressionMath) {
         $value = $this->expression_parse($builder, $query, $exp->get_value());
         $builder->dont_hash($value);
       } else {
@@ -311,13 +316,13 @@
         ExpressionNode $node) {
       $parts = array();
       foreach($node->get_expressions() as $exp) {
-        if ($exp instanceof ExpressionNode) {
+        if ($exp instanceof \phrames\query\ExpressionNode) {
           $parts[] = "({$this->expressionnode_parse($builder, $query, $exp)})";
         } else {
           $parts[] = $this->expression_parse($builder, $query, $exp); 
         }
       }
-      $stmt = implode(($node instanceof ExpressionAnd ? " AND " : " OR "), $parts);
+      $stmt = implode(($node instanceof \phrames\query\ExpressionAnd ? " AND " : " OR "), $parts);
       if (sizeof($parts)) $stmt = ($node->is_not() ? "NOT ({$stmt})" : $stmt);
       return $stmt;
     }
@@ -340,7 +345,7 @@
             && $query->get_parent() instanceof QuerySet 
             && sizeof($query->get_parent()->get_args())) {
           $stmt = "(" . $stmt;
-          if ($query instanceof QueryExclude)
+          if ($query instanceof \phrames\query\QueryExclude)
             $stmt .= ") AND ";
           else
             $stmt .= ") AND ";
@@ -350,15 +355,15 @@
       // build each individual expression and expression node
       $parts = array();
       foreach($query->get_args() as $arg) { 
-        if ($arg instanceof Expression)
+        if ($arg instanceof \phrames\query\Expression)
           $parts[] = $this->expression_parse($builder, $query, $arg);
-        elseif ($arg instanceof ExpressionNode)
+        elseif ($arg instanceof \phrames\query\ExpressionNode)
           $parts[] = "(" . $this->expressionnode_parse($builder, $query, $arg) . ")";
       }
 
       // piece all of the parts (expressions) together
       if (sizeof($parts)) {
-        if ($query instanceof QueryExclude)
+        if ($query instanceof \phrames\query\QueryExclude)
           $stmt .= "NOT ";
 
         if (sizeof($parts) > 1)
@@ -434,7 +439,7 @@
       if (!$stmt->execute()) {
         return array();
       } else {
-        return array_map("intval", array_values($stmt->fetchAll(PDO::FETCH_COLUMN))); 
+        return array_map("intval", array_values($stmt->fetchAll(\PDO::FETCH_COLUMN))); 
       }
     }
 
@@ -476,7 +481,7 @@
       if (!$stmt->execute()) {
         return 0;
       } else {
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         $actual_count = (int) $result["count"];
         // since you can't actually COUNT(id) using LIMIT, get
         // a theoretical count of results
@@ -502,8 +507,11 @@
       foreach($model::get_fields() as $field => $opts) {
         $type = @$opts["type"];
         $not_null = @$opts["required"] ? " NOT NULL" : "";
-        if (!($type instanceof OneToManyField || $type instanceof ManyToManyField)) {
-          switch(strtoupper(get_class($type))) {
+        if (!($type instanceof \phrames\model\OneToManyField
+              || $type instanceof \phrames\model\ManyToManyField)) {
+          $class = strtoupper(get_class($type));
+          $class = substr($class, strrpos($class, "\\") + 1);
+          switch($class) {
             case "IDFIELD":
               $pieces[] = "{$field} INT NOT NULL AUTO_INCREMENT";
               $pieces[] = "PRIMARY KEY ({$field})";

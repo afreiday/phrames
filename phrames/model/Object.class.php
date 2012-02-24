@@ -1,5 +1,13 @@
 <?php
 
+  namespace phrames\model;
+
+  use phrames\db\Database as Database;
+  use phrames\query\Field as Field;
+  use phrames\model\OneToOneField as OneToOneField;
+  use phrames\model\OneToManyField as OneToManyField;
+  use phrames\model\ForeignKey as ForeignKey;
+
   require_once("Model.class.php");
 
   abstract class Object {
@@ -86,9 +94,9 @@
                     forward_static_call(array("Field", "{$field}__exact"), $this->id)
                     );
             }
-            throw new Exception("Could not find relational field in {$through} referencing {$return}.");
+            throw new \Exception("Could not find relational field in {$through} referencing {$return}.");
           } else {
-            throw new Exception("Invalid qualifier: {$type[1]} not a valid Model class.");
+            throw new \Exception("Invalid qualifier: {$type[1]} not a valid Model class.");
           }
         } elseif ($type instanceof ManyToManyField) {
           $find = $type->get_connects_to();
@@ -106,19 +114,19 @@
           }
           
           if (!$find_field)
-            throw new Exception("Could not find matching {$find} reference in {$through}.");
+            throw new \Exception("Could not find matching {$find} reference in {$through}.");
           elseif (!$through_field)
             throw new Exception("Could not find matching " . get_class($this) . " reference in {$through}.");
           else {
-            $search_ids = $through::objects()->filter(forward_static_call(array("Field", "{$through_field}__exact"), $this->id()))->value_list($find_field);
+            $search_ids = $through::objects()->filter(forward_static_call(array("\\phrames\\query\\Field", "{$through_field}__exact"), $this->id()))->value_list($find_field);
             return $find::objects()->filter(
-                  forward_static_call(array("Field", "{$find::get_id_field()}__in"), $search_ids));
+                  forward_static_call(array("\\phrames\\query\\Field", "{$find::get_id_field()}__in"), $search_ids));
           }
         } else {
           $v = @$this->field_values[$field];
 
           // specially process the val before returning based on ModelField type
-          if ($type instanceof ModelField)
+          if ($type instanceof \phrames\model\ModelField)
             $v = $type->get($v);
 
           if (isset($fields[$field]["__get"]) && is_callable($fields[$field]["__get"]))
@@ -152,7 +160,7 @@
       $fields = $model::get_fields();
       $field_type = isset($fields[$field]["type"]) ? $fields[$field]["type"] : null;
 
-      if ($field == static::get_id_field() || $field_type instanceof IDField) {
+      if ($field == static::get_id_field() || $field_type instanceof \phrames\model\IDField) {
         throw new Exception("Cannot change ID field.");
       } elseif ($field_type instanceof OneToOneField || $field_type instanceof ForeignKey) {
         // trying to update a onetoone field reference
@@ -170,7 +178,7 @@
         if (isset($fields[$field]["__set"]) && is_callable($fields[$field]["__set"]))
           $value = $fields[$field]["__set"]($value);
 
-        if ($field_type instanceof ModelField)
+        if ($field_type instanceof \phrames\model\ModelField)
           $value = $field_type->set($value);
       }
 
@@ -245,7 +253,8 @@
       
       // check required fields
       foreach(static::get_required_fields() as $field) {
-        if ($this->$field === null || ($this->$field instanceof Model && !$this->$field->id())) {
+        if ($this->$field === null || 
+            ($this->$field instanceof Model && !$this->$field->id())) {
           throw new Exception("Field '{$field}' is required by " . get_class($this));
           return $this;
         }
@@ -296,7 +305,7 @@
                  */
                 if (is_callable($type->get_on_delete())) {
                   $model::objects()->filter(
-                      forward_static_call(array("Field", "{$field}__exact"), $this->id()))
+                      forward_static_call(array("\\phrames\\model\\Field", "{$field}__exact"), $this->id()))
                       ->update(array($field => $type->on_delete()));
                 /**
                  * ON DELETE PROTECT

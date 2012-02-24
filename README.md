@@ -99,7 +99,6 @@ The following is just a brief display of some of the features of phrames. For mo
 
 Next things to implement, in no particular order:
 
-- Use of PHP namespaces
 - Proper exception handling
 - Flexible cache integration
 - Expanded list of ModelField types

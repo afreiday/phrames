@@ -1,5 +1,7 @@
 <?php
 
+  namespace phrames\query;
+
   class QueryBuilder { 
 
     /**
