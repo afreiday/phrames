@@ -1,10 +1,6 @@
 <?php
 
-  require_once("Expression.class.php");
-  require_once("ExpressionNode.class.php");
-  require_once("QuerySet.class.php");
-  require_once(dirname(__FILE__) . "/../db/Database.class.php");
-
+  namespace phrames\query;
 
   class Field {
 
@@ -71,10 +67,10 @@
 
       $value = $value[0];
 
-      if (in_array(strtoupper($operator), Database::get_math_operators())) {
+      if (in_array(strtoupper($operator), \phrames\db\Database::get_math_operators())) {
         return new ExpressionMath($obj, $operator, $value);
       } else {
-        if (!in_array(strtoupper($operator), Database::get_operators()))
+        if (!in_array(strtoupper($operator), \phrames\db\Database::get_operators()))
           throw new Exception("Invalid query operator '{$operator}'.");
         else
           return new Expression($obj, $operator, $value);

@@ -1,5 +1,7 @@
 <?php
 
+  namespace phrames\query;
+
   require_once("Negatable.class.php");
   require_once("Field.class.php");
 

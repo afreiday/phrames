@@ -1,5 +1,7 @@
 <?php
 
+  namespace phrames\query;
+
   /**
    * Defines an object that can be negated, for example an expression
    * or expression node, such as 'NOT field < 123', and stores its

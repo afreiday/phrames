@@ -1,7 +1,7 @@
 <?php
-  
-  require_once(dirname(__FILE__) . "/../query/QuerySet.class.php");
 
+  namespace phrames\model;
+  
   class Manager {
     
     private $model = null;
@@ -11,7 +11,7 @@
     }
 
     public function get_query_set() {
-      return new QuerySet($this->model);
+      return new \phrames\query\QuerySet($this->model);
     }
 
     public function all() {
@@ -44,11 +44,11 @@
     public function get_or_create($args) {
       $and = array();
       foreach($args as $field => $val)
-        $and[] = forward_static_call(array("Field", "{$field}__exact"), $val);
+        $and[] = forward_static_call(array("phrames\query\Field", "{$field}__exact"), $val);
       
       try {
         return $this->get(_AND_($and));
-      } catch(Exception $e) {
+      } catch(\Exception $e) {
         $obj = $this->create($args);
         $obj->save();
         return $obj;

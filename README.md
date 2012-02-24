@@ -23,14 +23,17 @@ The following is just a brief display of some of the features of phrames. For mo
 ```php
 <?php
 
+  use phrames\query\Field as Field;
+  use phrames\model\Model as Model;
+
   require_once("phrames/phrames.php");
-  
+
   class User extends Model {
-  
+
     protected static function fields() {
       return array(
         "id" => array(
-          "type" => new IDField(),
+          "type" => new phrames\model\IDField(),
         ),
         "username" => array(
           "__get" => function($v) {
@@ -38,68 +41,67 @@ The following is just a brief display of some of the features of phrames. For mo
           },
         ),
         "clubs" => array(
-          "type" => new ManyToManyField("Club", "Membership"),
+          "type" => new phrames\model\ManyToManyField("Club", "Membership"),
         ),
       );
     }
-  
+
   }
-  
+
   class Club extends Model {
-  
+
     protected static function fields() {
       return array(
         "id" => array(
-          "type" => IDField(),
+          "type" => new phrames\model\IDField(),
         ),
         "members" => array(
-          "type" => new ManyToManyField("User", "Membership"),
+          "type" => new phrames\model\ManyToManyField("User", "Membership"),
         ),
       );
     }
-  
+
   }
-  
+
   class Membership extends Model {
-  
+
     protected static function fields() {
       return array(
         "id" => array(
-          "type" => new IDField(),
+          "type" => new phrames\model\IDField(),
         ),
         "user" => array(
-          "type" => new ForeignKey("User"),
+          "type" => new phrames\model\ForeignKey("User"),
         ),
         "club" => array(
-          "type" => new ForeignKey("Club"),
+          "type" => new phrames\model\ForeignKey("Club"),
         ),
         "is_admin" => array(
-          "type" => new BooleanField(),
+          "type" => new phrames\model\BooleanField(),
           "required" => true,
         ),
       );
     }
-  
+
   }
-  
+
   $users = User::objects()->all(); // get all users
-  
-  $users = $users->order_by("-username"); // sort descendingly by username
-  
+
+  $users = $users->order_by("-username");
+
   foreach($users as $user) {
     print "{$user->real_name} ({$user->username}) is a member of:\n";
     foreach($user->clubs as $club) // get clubs user is a member of
       print "{$club->name}\n";
+    print "\n";
   }
-  
-  User::objects()->filter(Field::age__lt(18))->delete(); // delete users under 18
+
 ```
 
 ## TODO List
 
 Next things to implement, in no particular order:
 
-- Use of PHP namespaces
 - Proper exception handling
 - Flexible cache integration
 - Expanded list of ModelField types

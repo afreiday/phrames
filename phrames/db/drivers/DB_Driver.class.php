@@ -1,5 +1,9 @@
 <?php
 
+  namespace phrames\db\drivers;
+
+  use phrames\query\QuerySet as QuerySet;
+
   interface DB_Driver {
 
     public static function operators();
