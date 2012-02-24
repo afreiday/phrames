@@ -84,7 +84,7 @@ The following is just a brief display of some of the features of phrames. For mo
   
   $users = User::objects()->all(); // get all users
   
-  $users->order_by("-username"); // sort descendingly by username
+  $users = $users->order_by("-username"); // sort descendingly by username
   
   foreach($users as $user) {
     print "{$user->real_name} ({$user->username}) is a member of:\n";
@@ -99,6 +99,8 @@ The following is just a brief display of some of the features of phrames. For mo
 
 Next things to implement, in no particular order:
 
+- Use of PHP namespaces
+- Proper exception handling
 - Flexible cache integration
 - Expanded list of ModelField types
 - Database sharding support
