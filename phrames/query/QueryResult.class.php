@@ -53,7 +53,8 @@
      * @return QueryResult
      */
     public function load() {
-      $db = new Database();
+      $class = $this->query->get_class();
+      $db = $class::get_db();
       $this->keys = $db->get_keys($this->query);
       $this->loaded = true;
       return $this;
@@ -85,7 +86,8 @@
         return sizeof($this->keys);
       } else {
         // get straight from DB
-        $db = new Database();
+        $class = $this->query->get_class();
+        $db = $class::get_db();
         return $db->get_query_count($this->query);
       }
     }

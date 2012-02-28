@@ -7,6 +7,8 @@
   use phrames\query\QuerySet as QuerySet;
   use phrames\query\Field as Field;
   use phrames\model\ForeignKey as ForeignKey;
+  use phrames\query\ExpressionNode as ExpressionNode;
+  use phrames\query\Expression as Expression;
 
   class DB_MYSQL implements \phrames\db\drivers\DB_Driver {
 
@@ -15,7 +17,7 @@
      *
      * @var PDO
      */
-    private static $conn = null;
+    private $conn = null;
 
     /**
      * Return an array of valid expression operators.
@@ -162,15 +164,18 @@
 
     /**
      * Construct a new driver object and initialize its
-     * database connection
+     * database connection using an externally-provided
+     * database connection info array
+     *
+     * @param array $conn_info
      */
-    public function __construct() {
-      if (!self::$conn instanceof \PDO)
-        self::$conn = new \PDO(
-            "mysql:host=" . Config_phrames::DB_HOST .
-              ";dbname=" . Config_phrames::DB_NAME,
-            Config_phrames::DB_USER,
-            Config_phrames::DB_PASS
+    public function __construct($conn_info) {
+      if (!$this->conn instanceof \PDO)
+        $this->conn = new \PDO(
+            "mysql:host=" . $conn_info["host"] .
+              ";dbname=" . $conn_info["name"],
+            $conn_info["user"],
+            $conn_info["pass"]
         );
     }
 
@@ -183,7 +188,7 @@
      * @return array
      */
     public function get_row($table, $id_field, $id) {
-      return self::$conn->query("SELECT * FROM {$table} WHERE {$id_field}={$id}")
+      return $this->conn->query("SELECT * FROM {$table} WHERE {$id_field}={$id}")
         ->fetch(\PDO::FETCH_ASSOC);
     }
 
@@ -207,15 +212,15 @@
         $stmt = substr(trim($stmt), 0, -1);
         $stmt .= ")";
 
-        $stmt = self::$conn->prepare($stmt);
+        $stmt = $this->conn->prepare($stmt);
         foreach($data as $field => $value)
           $stmt->bindValue(":{$field}", $value);
       } else {
-        $stmt = self::$conn->prepare($stmt);
+        $stmt = $this->conn->prepare($stmt);
       }
       $stmt->execute();
 
-      $id = self::$conn->query("SELECT {$id_field} FROM {$table} " .
+      $id = $this->conn->query("SELECT {$id_field} FROM {$table} " .
           "ORDER BY {$id_field} DESC LIMIT 0,1")->fetch(\PDO::FETCH_ASSOC);
       return $id[$id_field];
     }
@@ -238,7 +243,7 @@
       $stmt = substr(trim($stmt), 0, -1);
       $stmt .= " WHERE {$id_field} = {$id}"; 
       // bind params
-      $stmt = self::$conn->prepare($stmt);
+      $stmt = $this->conn->prepare($stmt);
       foreach($data as $field => $value)
         $stmt->bindValue(":{$field}", $value);
       $stmt->execute();
@@ -253,7 +258,7 @@
      * @param int $id
      */
     public function delete_row($table, $id_field, $id) {
-      self::$conn->exec("DELETE FROM {$table} WHERE {$id_field} = {$id}");
+      $this->conn->exec("DELETE FROM {$table} WHERE {$id_field} = {$id}");
     }
 
     public function field_parse(QueryBuilder $builder, QuerySet $query, Field $field) {
@@ -281,11 +286,45 @@
      * @return string
      */
     public function expression_parse(QueryBuilder $builder, QuerySet $query,
-        \phrames\query\Expression $exp) {
+        Expression $exp) {
       if ($exp instanceof \phrames\query\ExpressionMath) {
         $operators = self::math_operators();
       } else {
         $operators = self::operators();
+      }
+
+      /**
+       * The following tests for expression/queries using ForeignKey connections.
+       * Generally this would be accomplished with a simple LEFT JOIN, however if
+       * the two objects are being stored in different databases, this cannot
+       * be done. So we basically do a SELECT ... WHERE x IN (...) query 
+       * using the ID values from one database/table into another
+       */
+      $field = $exp->get_field();
+      $class = $query->get_class();
+      $through_field = $field->get_through();
+      if ($through_field) {
+        // we are testing a field through a foreignkey, make sure
+        // it's on the same database, loop through all fields to 
+        // check for ForeignKey
+        foreach($class::get_fields() as $def_field => $opts) {
+          if ($opts["type"] instanceof \phrames\model\ForeignKey && $def_field == $through_field) {
+            // found our $through_field and it's a ForeignKey
+            $through = $opts["type"]->get_connects_to();
+            // check to see if database connections are the same
+            if ($through::get_db()->get_conn_info() != $class::get_db()->get_conn_info()) {
+              // we have confirmed that our through_field test goes to another database
+              // let's now rebuild our expression as Field::X__in(...) expression that will work
+              // using the information we know we already have
+              $exp = forward_static_call(array("\phrames\query\Field", "{$through_field}__in"),
+                $through::objects()->filter(
+                  forward_static_call(array("\phrames\query\Field", "{$field->get_field()}__" . strtolower($exp->get_operator())), $exp->get_value())
+                )
+              );
+              break;
+            }
+          }
+        }
       }
 
       // get parser function
@@ -301,6 +340,7 @@
       } else {
         $value = $exp->get_value();
       }
+
       return ($exp->is_not() ? "NOT " : "") . $parser($builder, $field, $value);
     }
 
@@ -430,7 +470,7 @@
       if (sizeof($limit))
         $stmt .= "LIMIT " . implode(",", $limit);
 
-      $stmt = self::$conn->prepare(trim($stmt));
+      $stmt = $this->conn->prepare(trim($stmt));
 
       if (strlen($q))
         foreach($builder->get_params() as $param => $value)
@@ -472,7 +512,7 @@
         $stmt .= "WHERE {$q} ";
 
       // bind params
-      $stmt = self::$conn->prepare(trim($stmt));
+      $stmt = $this->conn->prepare(trim($stmt));
 
       if (strlen($q))
         foreach($builder->get_params() as $param => $value)

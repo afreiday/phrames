@@ -10,6 +10,8 @@
 
     public static function math_operators();
 
+    public function __construct($conn_info);
+
     public function get_row($table, $id_field, $id);
 
     public function insert_row($table, $id_field, $data);

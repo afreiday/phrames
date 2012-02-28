@@ -7,11 +7,22 @@
     /**
      * DATABASE
      */
-    const DB_DRIVER = "mysql";
-    const DB_HOST = "localhost";
-    const DB_NAME = "test";
-    const DB_USER = "root";
-    const DB_PASS = "";
+    public static $dbs = array(
+      "primary" => array(
+        "driver" => "mysql",
+        "host" => "localhost",
+        "name" => "test",
+        "user" => "root",
+        "pass" => "",
+      ),
+      "db_2" => array(
+        "driver" => "mysql",
+        "host" => "another_server",
+        "name" => "another_db",
+        "user" => "root",
+        "pass" => "",
+      )
+    );
 
     public static function get_declared_models() {
       $models = array();

@@ -73,7 +73,7 @@
        * could be written as
        * some_field_name__contains($some_value)
        */
-      $database = self::get_db();
+      $database = static::get_db();
       $operators = $database->get_operators();
       $math_operators = $database->get_math_operators();
       $functions = array();
@@ -184,13 +184,20 @@
       return $this->get_db()->create_table(get_called_class());
     }
 
+    /**
+     * Returns the Database object/driver wrapper to be used
+     * for this specific Model/Object instance. It can be overloaded
+     * to return any set of database connection details (ideally found
+     * in Config_phrames. So that, if you desire, you can use different
+     * databases/servers to handle different object-types/tables.
+     *
+     * By default it will search Config_phrames::$dbs and use either
+     * the array item with key "primary", or the first one available.
+     *
+     * @return Database
+     */
     public static function get_db() {
-      $dbs = \phrames\Config_phrames::$dbs;
-      if (!sizeof($dbs)) {
-        throw new Exception("No database profiles found.");
-      } else {
-        return new Database(isset($dbs["primary"]) ? $dbs["primary"] : $dbs[0]);
-      }
+      return new Database(Database::get_default_conn_info());
     }
 
   }

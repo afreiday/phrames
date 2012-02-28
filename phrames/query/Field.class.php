@@ -67,10 +67,12 @@
 
       $value = $value[0];
 
-      if (in_array(strtoupper($operator), \phrames\db\Database::get_math_operators())) {
+      $db = new \phrames\db\Database();
+
+      if (in_array(strtoupper($operator), $db->get_math_operators())) {
         return new ExpressionMath($obj, $operator, $value);
       } else {
-        if (!in_array(strtoupper($operator), \phrames\db\Database::get_operators()))
+        if (!in_array(strtoupper($operator), $db->get_operators()))
           throw new Exception("Invalid query operator '{$operator}'.");
         else
           return new Expression($obj, $operator, $value);

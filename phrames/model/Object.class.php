@@ -233,8 +233,7 @@
      */
     public function load() {
       if ($this->id()) {
-        $db = new Database();
-        $fields = $db->get_row(static::table_name(), static::get_id_field(), $this->id());
+        $fields = static::get_db()->get_row(static::table_name(), static::get_id_field(), $this->id());
         foreach($fields as $field => $value) 
           if ($field != static::get_id_field() && !in_array($field, $this->modified_fields))
             $this->field_values[$field] = $value;
@@ -249,7 +248,7 @@
      * @return Object
      */
     public function save() {
-      $db = new Database();
+      $db = static::get_db();
       
       // check required fields
       foreach(static::get_required_fields() as $field) {
@@ -336,8 +335,7 @@
           }
         }
 
-        $db = new Database();
-        $db->delete_row(static::table_name(), static::get_id_field(), $this->id());
+        static::get_db()->delete_row(static::table_name(), static::get_id_field(), $this->id());
       }
       // clear fields and return null
       $this->field_values = $this->modified_fields = array();
