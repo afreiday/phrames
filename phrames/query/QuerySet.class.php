@@ -118,7 +118,7 @@
 		public function filter() {
       if ($this->limit || $this->order_by)
         throw new Exception("Cannot further filter query after limiting or ordering.");
-      return new \phrames\query\QueryFilter($this, func_get_args()); 
+      return new QueryFilter($this, func_get_args()); 
 		}
 
     /**

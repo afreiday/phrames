@@ -34,24 +34,5 @@
 
   class ExpressionAnd extends ExpressionNode { }
 
-  function _AND_($args) {
-    if (!is_array($args))
-      $args = func_get_args();
-
-    if (!sizeof($args))
-      throw new Exception("_AND_ must contain at least one Expression");
-    else
-      return new ExpressionAnd($args);
-  }
-
   class ExpressionOr extends ExpressionNode { }
 
-  function _OR_($args) {
-    if (!is_array($args))
-      $args = func_get_args();
-
-    if (!sizeof($args))
-      throw new Exception("_OR_ must contain at least one Expression");
-    else
-      return new ExpressionOr($args);
-  }
