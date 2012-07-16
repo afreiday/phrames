@@ -104,9 +104,9 @@
         return $clone[0];
 
       if (!$num)
-        throw new Exception("{$this->get_class()} matching query does not exist.");
+        throw new \Exception("{$this->get_class()} matching query does not exist.");
 
-      throw new Exception("get() returned more than one {$this->get_class()} -- " .
+      throw new \Exception("get() returned more than one {$this->get_class()} -- " .
           "it returned {$num}");
 		}
 
@@ -117,7 +117,7 @@
      */
 		public function filter() {
       if ($this->limit || $this->order_by)
-        throw new Exception("Cannot further filter query after limiting or ordering.");
+        throw new \Exception("Cannot further filter query after limiting or ordering.");
       return new QueryFilter($this, func_get_args()); 
 		}
 
@@ -128,7 +128,7 @@
      */
 		public function exclude() {
       if ($this->limit || $this->order_by)
-        throw new Exception("Cannot further exclude query after limiting or ordering.");
+        throw new \Exception("Cannot further exclude query after limiting or ordering.");
       return new QueryExclude($this, func_get_args());
 		}
 
@@ -215,7 +215,7 @@
       if (!$limit) $limit = "18446744073709551610";
 
       if ($offset && $limit > 0 && $limit <= $offset)
-        throw new Exception("Limit must be greater than offset");
+        throw new \Exception("Limit must be greater than offset");
 
       $this->limit = "{$offset}:{$limit}";
       return $this;
@@ -332,7 +332,7 @@
      */
 
     public function offsetSet($offset, $value) {
-      throw new Exception("Cannot arbitrarily set hte object at a current " .
+      throw new \Exception("Cannot arbitrarily set hte object at a current " .
           "position within a QuerySet");
     }
 
@@ -350,6 +350,9 @@
         $this->limit($offset, $limit);
         return $this;
       } else {
+        $limit = (int) $limit;
+        if ($limit < 0)
+          $limit = sizeof($this) - 1 - abs($limit + 1);
         return $this->getIterator()->offsetGet($limit);
       }
     }
