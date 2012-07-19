@@ -86,11 +86,11 @@ Some of the power of phrames comes from pre-/re-defining your database table col
           "type" => new IDField(),
         ),
         "username" => array(
-          "type" => new CharField(30),
+          "type" => new phrames\model\CharField(30),
           "required" => true,
         ),
         "options" => array(
-          "type" => new JSONField(),
+          "type" => new phrames\model\JSONField(),
         ),
       );
     }
@@ -184,7 +184,7 @@ You can also define foreign key references from one object/table to another. For
     protected static function fields() {
       return array(
         "placed_by" => array(
-          "type" => new \phrames\model\ForeignKey("User"),
+          "type" => new phrames\model\ForeignKey("User"),
         ),
       );
     }
@@ -212,7 +212,7 @@ Each ForeignKey object can also have an on_delete flag to specify how to protect
 <?php
 
   /* ... */
-  new \phrames\model\ForeignKey("User", function() {
+  new phrames\model\ForeignKey("User", function() {
     $user = new User();
     $user->username = "DELETED_USER";
     $user->save();
@@ -237,7 +237,7 @@ One-to-many fields are pseudo fields (i.e. not defined in the database table) th
     protected static function fields() {
       return array(
         "orders" => array(
-          "type" => new \phrames\model\OneToManyField("Order"),
+          "type" => new phrames\model\OneToManyField("Order"),
         ),
       );
     }
@@ -268,7 +268,7 @@ Many-to-many fields are, like one-to-many fields, pseudo fields which can return
     protected static function fields() {
       return array(
         "members" => array(
-          "type" => new \phrames\model\ManyToManyField("User", "Membership"), // get Users in this club through Membership
+          "type" => new phrames\model\ManyToManyField("User", "Membership"), // get Users in this club through Membership
         ),
       );
     }
@@ -278,7 +278,7 @@ Many-to-many fields are, like one-to-many fields, pseudo fields which can return
     protected static function fields() {
       return array(
         "clubs" => array(
-          "type" => new \phrames\model\ManyToManyField("Club", "Membership"),
+          "type" => new phrames\model\ManyToManyField("Club", "Membership"),
         ),
       );
     }
@@ -289,10 +289,10 @@ Many-to-many fields are, like one-to-many fields, pseudo fields which can return
     protected static function fields() {
       return array(
         "user" => array(
-          "type" => new \phrames\model\ForeignKey("User"),
+          "type" => new phrames\model\ForeignKey("User"),
         ),
         "club" => array(
-          "type" => new \phrames\model\ForeignKey("Club"),
+          "type" => new phrames\model\ForeignKey("Club"),
         ),
       );
     }
@@ -324,7 +324,7 @@ Currently the MySQL database driver includes the ability to generate/dump a CREA
   print Membership::db_create_table();
 
   // all models CREATE TABLE
-  print \phrames\Config_phrames::db_create_tables();
+  print phrames\Config_phrames::db_create_tables();
   /* (it is recommended to define models in a logical order, where Models
       with ForeignKey fields are placed after the Models they reference) */
 
@@ -492,6 +492,9 @@ Queries can easily be sorted and spliced like arrays. Here are a few basic examp
   
   // gets every object after the 4th result
   $last_users = $users["4:"];
+
+  // obtain the last object in a set
+  $last_one_user = $users[-1];
     
 ```
 

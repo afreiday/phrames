@@ -347,8 +347,14 @@
     public function offsetGet($limit) {
       if (strpos($limit, ":") !== false) {
         list($offset, $limit) = explode(":", $limit);
-        $this->limit($offset, $limit);
-        return $this;
+        if ($offset == $limit) {
+          // something like 10:10, which will only return a single object
+          // so just return that instead of it's own query set
+          return $this->offsetGet($limit);
+        } else {
+          $this->limit($offset, $limit);
+          return $this;
+        }
       } else {
         $limit = (int) $limit;
         if ($limit < 0)
