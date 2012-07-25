@@ -26,6 +26,13 @@
       return call_user_func_array(array($this->get_query_set(), "get"), func_get_args());
     }
 
+    /**
+     * Create a new object of type $this->model
+     * using the passed set of arguments (fields and values)
+     *
+     * @param array
+     * @return object
+     */
     public function create($args) {
       $class = $this->model;
       $obj = new $class;

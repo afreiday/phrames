@@ -13,6 +13,12 @@
      */
     const table_name = "";
 
+    /**
+     * Return an array of the specific database fields
+     * defined for this Model
+     * 
+     * @return array
+     */
     public static function fields() {
       return array();
     }

@@ -2,6 +2,14 @@
 
   namespace phrames\query;
 
+  /**
+   * The QueryBuilder class is essentially a helper class
+   * for building complex queries. When a query is sent to
+   * the driver to be compiled and executed, a QueryBuilder
+   * object can assist by storing a list of required
+   * joins and hashed parameters (for PDO prepared statements)
+   * between method calls that compile the actual SQL statement
+   */
   class QueryBuilder { 
 
     /**

@@ -344,6 +344,14 @@
       return $this->result[$offset]->delete();
     }
 
+    /**
+     * Obtain a specific result item or range of items
+     * using array access syntax, such as $result["1:10"]
+     * or $result[12]
+     *
+     * @param mixed $limit
+     * @return mixed
+     */
     public function offsetGet($limit) {
       if (strpos($limit, ":") !== false) {
         list($offset, $limit) = explode(":", $limit);
