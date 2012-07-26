@@ -2,6 +2,8 @@
 
   namespace phrames\query;
 
+  use phrames\query\Aggregate as Aggregate;
+
   class QuerySet implements \IteratorAggregate, \ArrayAccess, \Countable {
 
     /**
@@ -317,6 +319,24 @@
         foreach($this as $obj)
           $obj->delete();
       return $this;
+    }
+
+    /**
+     * AGGREGATES & ANNOTATIONS
+     */
+
+    public function aggregate() {
+      $args = func_get_args();
+      foreach($args as $arg) {
+        if (!($arg instanceof Aggregate))
+          throw new Exception("QuerySet aggregate() method arguments " .
+            "must be of type Aggregate.");
+      }
+      $class = $this->get_class();
+      return $class::get_db()->get_aggregate_results($args, $this);
+    }
+
+    public function annotate() {
     }
 
     /**

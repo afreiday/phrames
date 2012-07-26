@@ -77,4 +77,8 @@
       return $this->driver->create_table($model);
     }
 
+    public function get_aggregate_results($aggregates, $query) {
+      return $this->driver->get_aggregate_results($aggregates, $query);
+    }
+
   }

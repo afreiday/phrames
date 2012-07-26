@@ -26,4 +26,6 @@
 
     public function create_table($model);
 
+    public function get_aggregate_results($aggregates, $result);
+
   }

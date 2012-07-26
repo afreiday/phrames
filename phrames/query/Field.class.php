@@ -73,7 +73,7 @@
         return new ExpressionMath($obj, $operator, $value);
       } else {
         if (!in_array(strtoupper($operator), $db->get_operators()))
-          throw new Exception("Invalid query operator '{$operator}'.");
+          throw new \Exception("Invalid query operator '{$operator}'.");
         else
           return new Expression($obj, $operator, $value);
       }

@@ -534,6 +534,57 @@
       }
     }
 
+    public function get_aggregate_results($aggregates, $query) {
+      $builder = new QueryBuilder();
+      $model = $query->get_class(); 
+
+      $select = "SELECT ";
+      $aggs = array();
+      // build each aggregate statement (like Avg('field'))
+      // and implode them together with commas
+      foreach($aggregates as $aggregate) {
+        $aggs[] = "{$aggregate->get_name()}(" .
+          // parse the field so we get proper joins
+          self::field_parse($builder, $query, $aggregate->get_field()) .
+          ") AS {$aggregate->get_return_key()}";
+      }
+      $select .= implode(", ", $aggs);
+      $select .= " FROM {$model::table_name()}";
+
+      // need to parse the actual query first to determine what
+      // joins are actually required
+      $q = $this->queryset_parse($builder, $query);
+
+      $joins = "";
+      $required_joins = $builder->get_joins();
+      foreach($model::get_joins() as $field => $join)
+        if (in_array($join::table_name(), $required_joins))
+          $joins .= "LEFT JOIN {$join::table_name()} " .
+            "ON {$join::table_name()}.{$join::get_id_field()} = " .
+            "{$model::table_name()}.{$field} ";
+
+      $stmt = "{$select} {$joins}";
+
+      if (strlen($q))
+        $stmt .= "WHERE {$q}";
+
+      $limit = $query->get_limit();
+      if (sizeof($limit))
+        $stmt .= "LIMIT " . implode(",", $limit);
+
+      $stmt = $this->conn->prepare(trim($stmt));
+
+      if (strlen($q))
+        foreach($builder->get_params() as $param => $value)
+          $stmt->bindValue(":{$param}", $value);
+
+      if (!$stmt->execute()) {
+        return array();
+      } else {
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+      }
+    }
+
     /**
      * Create a MySQL CREATE TABLE statement
      * using the defined fields of a particular Model
