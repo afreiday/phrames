@@ -3,6 +3,7 @@
   namespace phrames\models\fields;
 
   class BaseField implements Field, FieldValidator {
+
     protected $options = [
       // an option with a null value indicates it is required
       "validate"			=> true,

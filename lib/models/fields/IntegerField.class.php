@@ -14,13 +14,16 @@
 
   }
 
-  class PositiveIntegerField extends IntegerField {
-  }
+  /*
+   TODO: Do these and move them
 
-  class BigIntegerField extends IntegerField {
-  }
+    class PositiveIntegerField extends IntegerField {
+    }
 
-  class SmallIntegerField extends IntegerField {
-  }
+    class BigIntegerField extends IntegerField {
+    }
 
+    class SmallIntegerField extends IntegerField {
+    }
+  */
 
