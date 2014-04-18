@@ -1,5 +1,12 @@
 phrames: A django-Inspired PHP ORM/Framework
 ===
+## Status Update
+
+It's been about 2 years since I've done any development on this little side project. With my day job keeping me busy in C# I've been feeling a little rusty with PHP. I've decided to do a complete rewrite of my original code both because phrames is something I want to use and because I've learned a lot in the last two years. My rewrite includes large changes to the programmer API (creating objects/models, fields) from the example below.
+
+My goals for the project remain the same, but I will be using the [rewrite branch](https://github.com/afreiday/phrames/tree/rewrite) as my open working space -- committing whatever work I might have accomplished as time and motivation permits.
+
+- Andrew, Apr 18 2014
 
 ## About
 
