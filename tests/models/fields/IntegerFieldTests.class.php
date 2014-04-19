@@ -1,7 +1,7 @@
 <?php
 
-  require_once(__DIR__ . "/../vendor/autoload.php");
-  require_once(__DIR__ . "/../phrames.php");
+  require_once(__DIR__ . "/../../../vendor/autoload.php");
+  require_once(__DIR__ . "/../../../phrames.php");
   
   use phrames\models\fields as fields;
 
