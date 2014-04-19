@@ -13,6 +13,7 @@
 
     private $object; 
     protected static $fields = [];
+    protected $options = []; // TODO: https://docs.djangoproject.com/en/1.7/ref/models/options/
 
     public function __construct($init_values = []) {
       $this->init_object();

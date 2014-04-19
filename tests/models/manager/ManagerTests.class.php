@@ -29,5 +29,13 @@
     public function testManagerConstructNonModelClass() {
       new Manager("AnotherNonModelClass");
     }
+
+    public function testManagerGetAllQuery() {
+      $this->assertInstanceOf('phrames\models\query\QueryAll', (new Manager("AnotherModel"))->all());
+    }
+
+    public function testManagerGetIteratorGetsAllQuery() {
+      $this->assertInstanceOf('phrames\models\query\QueryAll', (new Manager("AnotherModel"))->getIterator());
+    }
     
   }

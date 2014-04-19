@@ -32,5 +32,5 @@
   $article = new Article();
   $article->reporter = $reporter;
 
-  var_dump($article);
+  var_dump(Article::objects());
 
