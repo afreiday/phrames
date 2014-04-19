@@ -12,7 +12,7 @@
   class ManagerTests extends PHPUnit_Framework_TestCase {
 
     public function testManagerConstruct() {
-      $this->assertTrue(new Manager("AnotherModel") instanceof Manager);
+      $this->assertInstanceof('phrames\models\manager\Manager', new Manager("AnotherModel"));
     }
 
     /**

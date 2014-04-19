@@ -27,7 +27,7 @@
     }
 
     public function testBooleanFieldConstruct() {
-      $this->assertTrue(new fields\BooleanField() instanceof fields\BooleanField);
+      $this->assertInstanceOf('phrames\models\fields\BooleanField', new fields\BooleanField());
     }
 
     /**

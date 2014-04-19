@@ -20,8 +20,7 @@
   class ForeignKeyFieldTests extends PHPUnit_Framework_TestCase {
 
     public function testForeignKeyValidModelRelationship() {
-      $field = new fields\ForeignKey("SomeModel");
-      $this->assertTrue($field instanceof fields\ForeignKey);
+      $this->assertInstanceOf('phrames\models\fields\ForeignKey', new fields\ForeignKey("SomeModel"));
     }
 
     /**

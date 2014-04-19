@@ -58,8 +58,7 @@
     class ModelTests extends PHPUnit_Framework_TestCase {
       
       public function testModelConstruct() {
-        $obj = new TestModelEmpty();
-        $this->assertTrue($obj instanceof models\Model);
+        $this->assertInstanceOf('phrames\models\Model', new TestModelEmpty());
       }
 
       public function testEmptyModelToString() {
@@ -143,7 +142,7 @@
       }
 
       public function testModelManager() {
-        $this->assertTrue(TestModel::objects() instanceof models\manager\Manager);
+        $this->assertInstanceOf("phrames\models\manager\Manager", TestModel::objects());
       }
         
     }
